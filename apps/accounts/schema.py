@@ -29,8 +29,11 @@ class AppUserType(graphene.ObjectType):
 class AuthPayload(graphene.ObjectType):
     uid = graphene.String()
     email = graphene.String()
+    # Flutter mutation requests camelCase 'displayName' / 'photoURL' / 'createdAt'
+    # graphene auto-converts snake_case, but 'photo_url' → 'photoUrl' (not 'photoURL'),
+    # so we override the GraphQL field name explicitly.
     display_name = graphene.String()
-    photo_url = graphene.String()
+    photo_url = graphene.String(name='photoURL')
     provider = graphene.String()
     created_at = graphene.String()
     access_token = graphene.String()
@@ -112,6 +115,66 @@ class ResetPassword(graphene.Mutation):
 
 # ─────────── Query + Mutation roots ───────────
 
+class SocialSignIn(graphene.Mutation):
+    """
+    Accepts Firebase social-auth user claims and returns a backend JWT.
+    The mobile app performs the OAuth flow (Google / Facebook) via Firebase,
+    then sends the resulting uid/email here so the backend can create or
+    update the matching AppUser and issue its own JWT.
+
+    NOTE: For production, verify the Firebase ID token via firebase-admin SDK.
+          For the current dev setup we trust the claims directly.
+    """
+    class Arguments:
+        uid = graphene.String(required=True)
+        email = graphene.String(required=True)
+        display_name = graphene.String()
+        # Force 'photoURL' (capital URL) to match Flutter DTO field name
+        photo_url = graphene.String(name='photoURL')
+        provider = graphene.String(required=True)
+
+    Output = AuthPayload
+
+    def mutate(self, info, uid, email, provider,
+               display_name='', photo_url='', **kwargs):
+        # Normalise — never store empty string as email
+        email = (email or '').lower().strip() or None
+
+        # Find by firebase_uid first, then fall back to email only if non-null
+        user = AppUser.objects.filter(firebase_uid=uid).first()
+        if user is None and email:
+            user = AppUser.objects.filter(email=email).first()
+
+        if user is None:
+            # New social user — create without a password
+            user = AppUser.objects.create_user(
+                email=email,  # already None if empty
+                password=None,
+                display_name=display_name or '',
+                photo_url=photo_url or '',
+                provider=provider,
+                firebase_uid=uid,
+            )
+        else:
+            # Sync latest profile data
+            changed = False
+            if user.firebase_uid != uid:
+                user.firebase_uid = uid
+                changed = True
+            if display_name and user.display_name != display_name:
+                user.display_name = display_name
+                changed = True
+            if photo_url and user.photo_url != photo_url:
+                user.photo_url = photo_url
+                changed = True
+            if changed:
+                user.save(update_fields=[f for f in
+                          ['firebase_uid', 'display_name', 'photo_url']
+                          if changed])
+
+        return _auth_payload(user)
+
+
 class AuthQuery(graphene.ObjectType):
     me = graphene.Field(AppUserType)
 
@@ -127,3 +190,4 @@ class AuthMutation(graphene.ObjectType):
     sign_up = SignUp.Field()
     sign_out = SignOut.Field()
     reset_password = ResetPassword.Field()
+    social_sign_in = SocialSignIn.Field()

@@ -1,4 +1,5 @@
 import graphene
+import json as json_lib
 from graphene_django import DjangoObjectType
 from .models import Destination
 from django.db.models import Q
@@ -9,9 +10,35 @@ class DestinationType(DjangoObjectType):
         model = Destination
         fields = (
             'id', 'name', 'description', 'location', 'rating', 'price',
-            'images', 'activities', 'is_featured', 'category',
-            'available_spots', 'discount', 'latitude', 'longitude',
+            'is_featured', 'category', 'available_spots', 'discount',
+            'latitude', 'longitude',
         )
+
+    # Override JSONField columns to return actual lists instead of JSON strings
+    images = graphene.List(graphene.String)
+    activities = graphene.List(graphene.String)
+
+    def resolve_images(self, info):
+        val = self.images
+        if isinstance(val, list):
+            return val
+        if isinstance(val, str):
+            try:
+                return json_lib.loads(val)
+            except (ValueError, TypeError):
+                return []
+        return []
+
+    def resolve_activities(self, info):
+        val = self.activities
+        if isinstance(val, list):
+            return val
+        if isinstance(val, str):
+            try:
+                return json_lib.loads(val)
+            except (ValueError, TypeError):
+                return []
+        return []
 
 
 class DestinationQuery(graphene.ObjectType):

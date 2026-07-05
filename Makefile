@@ -1,21 +1,31 @@
-# setup venv, install deps and run migrations
+PYTHON = .venv/bin/python
+MANAGE = $(PYTHON) manage.py
+
+# setup venv, install deps
 setup:
-	python -m venv .venv && . .venv/bin/activate && pip install -r requirements.txt
+	python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
 
 migrate:
-	python manage.py migrate
+	$(MANAGE) migrate
 
 makemigrations:
-	python manage.py makemigrations
+	$(MANAGE) makemigrations
 
 createsuperuser:
-	python manage.py createsuperuser
+	$(MANAGE) createsuperuser
+
+create_admin:
+	$(MANAGE) create_admin
 
 run:
-	python manage.py runserver
+	$(MANAGE) runserver 0.0.0.0:8000
 
 test:
-	python manage.py test apps --verbosity=2
+	$(MANAGE) test apps --verbosity=2
+
+seed:
+	$(MANAGE) seed_destinations
+	$(MANAGE) seed_users
 
 shell:
-	python manage.py shell
+	$(MANAGE) shell
