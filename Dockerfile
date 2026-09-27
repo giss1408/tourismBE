@@ -1,4 +1,4 @@
-# Production image: gunicorn behind a TLS-terminating proxy (see
+# Production image: gunicorn behind a TLS-terminating proxy (Render, or
 # deploy/docker-compose.prod.yml). Development can keep using `make run`.
 FROM python:3.12-slim AS base
 
@@ -28,6 +28,8 @@ USER app
 EXPOSE 8000
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
-    CMD python -c "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/healthz/')" || exit 1
+    CMD python -c "import os, urllib.request; urllib.request.urlopen('http://127.0.0.1:%s/healthz/' % os.environ.get('PORT', '8000'))" || exit 1
 
-CMD ["sh", "-c", "python manage.py migrate --noinput && gunicorn config.wsgi:application --bind 0.0.0.0:8000 --workers ${GUNICORN_WORKERS:-3} --timeout 300 --access-logfile -"]
+# PORT is set by hosts such as Render. RUN_MIGRATIONS=0 when the host runs
+# them as a separate pre-deploy step (see render.yaml).
+CMD ["sh", "-c", "if [ \"${RUN_MIGRATIONS:-1}\" = 1 ]; then python manage.py migrate --noinput; fi && exec gunicorn config.wsgi:application --bind 0.0.0.0:${PORT:-8000} --workers ${GUNICORN_WORKERS:-3} --timeout 300 --access-logfile -"]

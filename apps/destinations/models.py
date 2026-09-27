@@ -4,7 +4,10 @@ from django.db import models
 
 def public_url(file_field):
     """Absolute URL of an uploaded file, for the apps."""
-    return f'{settings.PUBLIC_BASE_URL.rstrip("/")}{file_field.url}'
+    url = file_field.url
+    if url.startswith(('http://', 'https://')):
+        return url  # object storage (MEDIA_BUCKET) returns full URLs
+    return f'{settings.PUBLIC_BASE_URL.rstrip("/")}{url}'
 
 
 class Destination(models.Model):

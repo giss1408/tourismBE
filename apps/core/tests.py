@@ -219,3 +219,45 @@ class AccountAndDevicesTest(GraphQLTestCase):
             call_command('send_trip_reminders', stdout=mock.Mock())
             call_command('send_trip_reminders', stdout=mock.Mock())
         notify.assert_called_once()
+
+
+class DeploymentTests(TestCase):
+    @override_settings(ALLOWED_HOSTS=['api.example.com'], SECURE_SSL_REDIRECT=True)
+    def test_health_check_answers_probes_by_ip_over_http(self):
+        # Render and Docker probe the container directly, not via the domain.
+        response = Client().get('/healthz/', HTTP_HOST='10.0.0.7:10000')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(), {'status': 'ok'})
+
+    @override_settings(ALLOWED_HOSTS=['api.example.com'])
+    def test_other_paths_still_validate_the_host(self):
+        response = Client().get('/legal/terms/', HTTP_HOST='evil.example.com')
+        self.assertEqual(response.status_code, 400)
+
+    def test_object_storage_urls_are_kept_as_they_are(self):
+        from apps.destinations.models import public_url
+
+        stored = mock.Mock(url='https://media.example.com/media/2026/09/a.jpg')
+        self.assertEqual(public_url(stored), 'https://media.example.com/media/2026/09/a.jpg')
+        on_disk = mock.Mock(url='/media/2026/09/a.jpg')
+        with override_settings(PUBLIC_BASE_URL='https://api.example.com/'):
+            self.assertEqual(public_url(on_disk), 'https://api.example.com/media/2026/09/a.jpg')
+
+    def test_media_bucket_settings_give_public_urls(self):
+        # Fresh interpreter: storage settings are read once at start-up.
+        import os
+        import subprocess
+        import sys
+
+        env = {**os.environ, 'DJANGO_SETTINGS_MODULE': 'config.settings', 'DEBUG': 'True',
+               'MEDIA_BUCKET': 'akwaba-media',
+               'MEDIA_ENDPOINT_URL': 'https://account.r2.cloudflarestorage.com',
+               'MEDIA_PUBLIC_DOMAIN': 'media.example.com',
+               'MEDIA_ACCESS_KEY_ID': 'id', 'MEDIA_SECRET_ACCESS_KEY': 'secret'}
+        script = ('import django; django.setup()\n'
+                  'from django.core.files.storage import default_storage as s\n'
+                  'print(s.url("media/2026/09/a.jpg"))')
+        output = subprocess.run([sys.executable, '-c', script], env=env, check=True,
+                                capture_output=True, text=True).stdout.strip()
+        # Disk storage would give /media/...: the bucket's public domain is used.
+        self.assertEqual(output, 'https://media.example.com/media/2026/09/a.jpg')

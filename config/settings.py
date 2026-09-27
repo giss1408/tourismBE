@@ -29,6 +29,13 @@ ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1', cast=Csv(
 # Origins allowed to post forms to the admin (e.g. https://api.example.com).
 CSRF_TRUSTED_ORIGINS = config('CSRF_TRUSTED_ORIGINS', default='', cast=Csv())
 
+# Render sets these on every service: its own *.onrender.com address works
+# without listing it (a custom domain still goes in ALLOWED_HOSTS).
+RENDER_EXTERNAL_HOSTNAME = config('RENDER_EXTERNAL_HOSTNAME', default='')
+if RENDER_EXTERNAL_HOSTNAME:
+    ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
+    CSRF_TRUSTED_ORIGINS.append(f'https://{RENDER_EXTERNAL_HOSTNAME}')
+
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -51,6 +58,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'config.middleware.HealthCheckMiddleware',
     'django.middleware.security.SecurityMiddleware',
     # Serves the admin's static files from gunicorn, compressed and cached.
     'whitenoise.middleware.WhiteNoiseMiddleware',
@@ -107,7 +115,8 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
-# Uploaded photos and videos (served by Caddy in production, see deploy/).
+# Uploaded photos and videos: on disk by default (served by Caddy in the
+# deploy/ stack), in an S3-compatible bucket when MEDIA_BUCKET is set.
 MEDIA_URL = '/media/'
 MEDIA_ROOT = config('MEDIA_ROOT', default=str(BASE_DIR / 'mediafiles'))
 MEDIA_MAX_IMAGE_MB = config('MEDIA_MAX_IMAGE_MB', default=15, cast=int)
@@ -127,6 +136,29 @@ STORAGES = {
         ),
     },
 }
+
+# S3-compatible object storage (Cloudflare R2, AWS S3, Backblaze B2...) for
+# hosts without a persistent disk, such as Render. The bucket must be publicly
+# readable at MEDIA_PUBLIC_DOMAIN (R2: r2.dev subdomain or a custom domain).
+MEDIA_BUCKET = config('MEDIA_BUCKET', default='')
+if MEDIA_BUCKET:
+    STORAGES['default'] = {
+        'BACKEND': 'storages.backends.s3.S3Storage',
+        'OPTIONS': {
+            'bucket_name': MEDIA_BUCKET,
+            # R2: https://<account id>.r2.cloudflarestorage.com; empty for AWS.
+            'endpoint_url': config('MEDIA_ENDPOINT_URL', default='') or None,
+            'region_name': config('MEDIA_REGION', default='auto'),
+            'access_key': config('MEDIA_ACCESS_KEY_ID', default=''),
+            'secret_key': config('MEDIA_SECRET_ACCESS_KEY', default=''),
+            # Public, unsigned URLs: the apps cache them.
+            'custom_domain': config('MEDIA_PUBLIC_DOMAIN', default='') or None,
+            'querystring_auth': False,
+            'default_acl': None,
+            'file_overwrite': False,
+            'object_parameters': {'CacheControl': 'public, max-age=2592000, immutable'},
+        },
+    }
 
 if TESTING:
     # Password hashing is deliberately slow; tests do not need that.
@@ -178,7 +210,8 @@ SUPPORT_EMAIL = config('SUPPORT_EMAIL', default='support@akwaba-ivoire.com')
 # International format without '+' or spaces, e.g. 2250700000000.
 SUPPORT_WHATSAPP = config('SUPPORT_WHATSAPP', default='')
 # Public base URL of this backend, for links in emails and legal pages.
-PUBLIC_BASE_URL = config('PUBLIC_BASE_URL', default='http://localhost:8000')
+PUBLIC_BASE_URL = config(
+    'PUBLIC_BASE_URL', default=config('RENDER_EXTERNAL_URL', default='http://localhost:8000'))
 
 # ── Email ────────────────────────────────────────────────────────────────────
 # Development prints emails to the console; production uses SMTP.

@@ -7,6 +7,23 @@ from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
 
 log = logging.getLogger('tourism.graphql')
 
+
+class HealthCheckMiddleware:
+    """Answers /healthz/ before host validation and the HTTPS redirect.
+
+    Load balancers and Docker probe the container by IP over plain HTTP,
+    with a Host header that is not in ALLOWED_HOSTS.
+    """
+
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        if request.path == '/healthz/':
+            from apps.core.views import healthz
+            return healthz(request)
+        return self.get_response(request)
+
 def _authenticate(request):
     """Sets request.user from the bearer token, and only from it.
 

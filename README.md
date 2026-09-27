@@ -37,7 +37,48 @@ Everything is configured with environment variables:
 Production refuses to start without `SECRET_KEY`, and is the default: `DEBUG`
 must be set to `True` explicitly for development.
 
-## Deployment
+## Deploy on Render
+
+`render.yaml` describes the whole stack (Frankfurt region): the API as a
+Docker web service, PostgreSQL 16, a Key Value (Redis) instance for rate
+limiting, and a daily cron job for trip reminders. Migrations run as a
+pre-deploy step; a failed migration leaves the running version untouched.
+
+Render disks are wiped on every deploy, so uploaded photos and videos go to
+an S3-compatible bucket. Cloudflare R2 is recommended (10 GB free, no egress
+fees):
+
+1. **Bucket**: Cloudflare › R2 › Create bucket (e.g. `akwaba-media`). In its
+   settings, enable public access (r2.dev subdomain, or better a custom domain
+   such as `media.akwaba-ivoire.com`). Then R2 › Manage API tokens › create a
+   token with *Object Read & Write* on that bucket.
+2. **Blueprint**: Render Dashboard › New › Blueprint › this repository. Fill
+   the values it asks for:
+   - `MEDIA_BUCKET` = bucket name, `MEDIA_ENDPOINT_URL` =
+     `https://<account id>.r2.cloudflarestorage.com`, `MEDIA_ACCESS_KEY_ID` /
+     `MEDIA_SECRET_ACCESS_KEY` = the token, `MEDIA_PUBLIC_DOMAIN` = the public
+     host without `https://`;
+   - Stripe, SMTP, `FIREBASE_PROJECT_ID`, `SUPPORT_WHATSAPP`, `SENTRY_DSN`
+     (leave empty what you do not use yet).
+3. **Push notifications** (optional): on `akwaba-api` *and*
+   `akwaba-trip-reminders`, Environment › Secret Files ›
+   `firebase-service-account.json`.
+4. **Admin account**: `akwaba-api` › Shell ›
+   `python manage.py createsuperuser`.
+5. **Stripe**: webhook `https://<host>/payments/stripe/webhook/` (see below).
+6. **Apps**: set `GRAPHQL_ENDPOINT` in `config/prod.json` of the traveller and
+   manager apps to `https://<host>/graphql/`.
+
+`<host>` is `akwaba-api.onrender.com` until a custom domain is attached
+(Settings › Custom Domains). With a custom domain, also set
+`ALLOWED_HOSTS`, `CSRF_TRUSTED_ORIGINS` (`https://…`) and `PUBLIC_BASE_URL`
+to it. Check it runs: `https://<host>/healthz/` answers `{"status": "ok"}`.
+
+Plans in the Blueprint: web and cron `starter`, database `basic-256mb`, Key
+Value `free`. Free web services sleep when idle and miss Stripe webhooks; do
+not use them in production.
+
+## Self-hosted deployment
 
 The production stack (`deploy/docker-compose.prod.yml`) runs:
 
