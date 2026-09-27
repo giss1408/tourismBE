@@ -1,0 +1,32 @@
+{% extends "legal/base.html" %}
+{% block title %}Politique de confidentialité{% endblock %}
+{% block content %}
+<h1>Politique de confidentialité</h1>
+<p class="meta">{{ company }} · Contact : {{ support_email }}</p>
+<p class="draft">Projet : à faire relire par un juriste et à compléter avec les mentions légales de l’exploitant avant publication.</p>
+
+<h2>1. Responsable du traitement</h2>
+<p>{{ company }} est responsable des données personnelles traitées via l’application et ce site. Pour toute question sur vos données : {{ support_email }}.</p>
+
+<h2>2. Données collectées et finalités</h2>
+<ul>
+  <li><strong>Compte</strong> : adresse e-mail, nom, photo de profil (connexion sociale) – pour gérer votre compte (contrat).</li>
+  <li><strong>Réservations</strong> : destination, dates, nombre de voyageurs, remarques, montants – pour organiser votre séjour (contrat) et tenir notre comptabilité (obligation légale).</li>
+  <li><strong>Paiements</strong> : traités par Stripe. Nous ne voyons ni ne conservons votre numéro de carte ; nous gardons le statut et le montant du paiement.</li>
+  <li><strong>Notifications</strong> : un identifiant d’appareil, pour vous informer de votre voyage (consentement, désactivable dans les réglages du téléphone).</li>
+  <li><strong>Statistiques d’utilisation</strong> : écrans consultés et actions dans l’application, uniquement si vous les acceptez (consentement, retirable dans l’application).</li>
+  <li><strong>Avis</strong> : votre note et votre commentaire, publiés avec votre prénom.</li>
+</ul>
+
+<h2>3. Destinataires</h2>
+<p>Notre hébergeur, Stripe (paiements), Google Firebase (connexion et notifications), notre prestataire d’e-mails et, pour votre séjour, les guides et partenaires locaux concernés. Certains peuvent traiter des données hors de l’UE, encadrés par les clauses contractuelles types de la Commission européenne.</p>
+
+<h2>4. Durées de conservation</h2>
+<p>Données du compte : jusqu’à la suppression du compte. Réservations et paiements : 10 ans (obligations comptables), sans lien avec le compte supprimé. Statistiques d’utilisation : 13 mois maximum.</p>
+
+<h2>5. Vos droits</h2>
+<p>Conformément au RGPD, vous pouvez accéder à vos données, les rectifier, les effacer, les récupérer, vous opposer à leur traitement et retirer votre consentement à tout moment. Vous pouvez supprimer votre compte directement dans l’application (Profil › Supprimer le compte) ou écrire à {{ support_email }}. Vous pouvez aussi saisir la CNIL ou l’autorité de protection des données de votre pays.</p>
+
+<h2>6. Sécurité</h2>
+<p>Les données transitent en HTTPS, les mots de passe sont stockés sous forme chiffrée (hachée) et l’accès à nos systèmes est restreint.</p>
+{% endblock %}

@@ -1,0 +1,15 @@
+# Caddy obtains and renews the TLS certificate for API_DOMAIN automatically.
+{$API_DOMAIN} {
+	encode gzip
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		-Server
+	}
+	# Uploaded photos and videos, served directly and cached by the apps.
+	handle_path /media/* {
+		root * /srv/media
+		header Cache-Control "public, max-age=2592000, immutable"
+		file_server
+	}
+	reverse_proxy web:8000
+}

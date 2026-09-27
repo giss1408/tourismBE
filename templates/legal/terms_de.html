@@ -1,0 +1,28 @@
+{% extends "legal/base.html" %}
+{% block title %}Allgemeine Geschäftsbedingungen{% endblock %}
+{% block content %}
+<h1>Allgemeine Geschäftsbedingungen</h1>
+<p class="meta">{{ company }} · Kontakt: {{ support_email }}</p>
+<p class="draft">Entwurf: vor der Veröffentlichung juristisch prüfen (Pauschalreiserecht, Registrierung des Veranstalters und Versicherungsangaben ergänzen).</p>
+
+<h2>1. Gegenstand</h2>
+<p>Diese Bedingungen gelten für Buchungen von Aufenthalten, Rundreisen und geführten Aktivitäten an der Elfenbeinküste über die App {{ company }}.</p>
+
+<h2>2. Buchung</h2>
+<p>Eine Buchungsanfrage wird als <em>ausstehend</em> erfasst. Sie wird <em>bestätigt</em>, sobald die Verfügbarkeit geprüft und gegebenenfalls die Zahlung eingegangen ist. Sie erhalten bei jedem Schritt eine E-Mail.</p>
+
+<h2>3. Preise und Zahlung</h2>
+<p>Preise werden in Euro inklusive Steuern angezeigt, mit einem Richtbetrag in CFA-Franc (XOF, fester Kurs 1 € = 655,957 FCFA). Pro Buchung fällt eine Servicegebühr von {{ service_fee }} € an. Die Zahlung erfolgt online über Stripe (Karte, PayPal, Apple Pay, Google Pay).</p>
+
+<h2>4. Stornierung durch den Reisenden</h2>
+<p>Die Stornierung ist bis {{ free_cancellation_days }} Tage vor Beginn des Aufenthalts kostenlos: Der Betrag wird vollständig erstattet. Danach kann die Buchung storniert werden, wird aber nicht erstattet, sofern das Gesetz nichts anderes vorsieht. Erstattungen erscheinen innerhalb von 5 bis 10 Werktagen.</p>
+
+<h2>5. Stornierung oder Änderung durch uns</h2>
+<p>Müssen wir eine bestätigte Buchung stornieren oder wesentlich ändern, bieten wir Ihnen eine Alternative oder eine vollständige Erstattung an.</p>
+
+<h2>6. Reiseformalitäten</h2>
+<p>Für Reisepass, Visum und die vorgeschriebene Gelbfieberimpfung sind Sie selbst verantwortlich. Die Informationen in der App sind unverbindlich; beachten Sie vor der Abreise die Reisehinweise Ihrer Regierung.</p>
+
+<h2>7. Beschwerden und Streitigkeiten</h2>
+<p>Schreiben Sie an {{ support_email }}. Kommt keine Lösung zustande, können Sie die Online-Streitbeilegungsplattform der EU-Kommission oder eine Verbraucherschlichtungsstelle nutzen.</p>
+{% endblock %}

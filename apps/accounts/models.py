@@ -28,6 +28,8 @@ class AppUser(AbstractBaseUser, PermissionsMixin):
     display_name = models.CharField(max_length=150, blank=True)
     photo_url = models.URLField(blank=True)
     provider = models.CharField(max_length=50, default='email')
+    # Language for emails and notifications: fr, en or de.
+    language = models.CharField(max_length=5, default='fr')
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)

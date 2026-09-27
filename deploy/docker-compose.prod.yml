@@ -1,0 +1,62 @@
+# Production stack: Caddy (HTTPS, automatic Let's Encrypt certificates) →
+# gunicorn → PostgreSQL, with Redis for rate limiting and a scheduler for
+# daily jobs. Usage, from the repository root:
+#   cp deploy/env.production.example deploy/production.env   # then fill it
+#   docker compose -f deploy/docker-compose.prod.yml up -d --build
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    env_file: [production.env]
+    volumes: [pgdata:/var/lib/postgresql/data]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER}"]
+      interval: 10s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+
+  web:
+    build: ..
+    restart: unless-stopped
+    env_file: [production.env]
+    environment:
+      MEDIA_ROOT: /media
+    volumes:
+      - "${FCM_CREDENTIALS_DIR:-./secrets}:/secrets:ro"
+      - media:/media
+    depends_on:
+      db: {condition: service_healthy}
+      redis: {condition: service_started}
+
+  # Daily jobs: trip reminders at 09:00 UTC, database backup at 02:30 UTC.
+  scheduler:
+    build: ..
+    restart: unless-stopped
+    env_file: [production.env]
+    user: root
+    volumes:
+      - "./backups:/backups"
+      - "${FCM_CREDENTIALS_DIR:-./secrets}:/secrets:ro"
+    command: /app/scripts/scheduler.sh
+    depends_on:
+      db: {condition: service_healthy}
+
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports: ["80:80", "443:443"]
+    env_file: [production.env]
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - media:/srv/media:ro
+    depends_on: [web]
+
+volumes:
+  pgdata:
+  caddy_data:
+  # Uploaded photos and videos: include it in your server backups.
+  media:

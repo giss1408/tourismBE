@@ -1,0 +1,28 @@
+{% extends "legal/base.html" %}
+{% block title %}Terms of sale{% endblock %}
+{% block content %}
+<h1>Terms of sale</h1>
+<p class="meta">{{ company }} · Contact: {{ support_email }}</p>
+<p class="draft">Draft: to be reviewed by a lawyer before publication (package travel rules, operator registration and insurance details to be added).</p>
+
+<h2>1. Purpose</h2>
+<p>These terms govern bookings of stays, tours and guided activities in Côte d'Ivoire made through the {{ company }} app.</p>
+
+<h2>2. Booking</h2>
+<p>A booking request is registered as <em>pending</em>. It becomes <em>confirmed</em> once availability is checked and, where applicable, payment is received. You receive an email at each step.</p>
+
+<h2>3. Prices and payment</h2>
+<p>Prices are shown in euros, taxes included, with an indicative amount in CFA francs (XOF, fixed rate €1 = 655.957 FCFA). A service fee of €{{ service_fee }} applies to each booking. Payment is made online through Stripe (card, PayPal, Apple Pay, Google Pay).</p>
+
+<h2>4. Cancellation by the traveller</h2>
+<p>Cancellation is free up to {{ free_cancellation_days }} days before the start of the stay: the full amount is refunded. After that, the booking can still be cancelled but is not refunded, unless the law provides otherwise. Refunds appear within 5 to 10 business days.</p>
+
+<h2>5. Cancellation or changes by us</h2>
+<p>If we must cancel or substantially change a confirmed booking, we will offer an alternative or a full refund.</p>
+
+<h2>6. Travel formalities</h2>
+<p>You are responsible for your passport, visa and the mandatory yellow fever vaccination. The information given in the app is indicative; check your government's travel advice before departure.</p>
+
+<h2>7. Complaints and disputes</h2>
+<p>Write to {{ support_email }}. If no solution is found, you may use the European Commission's online dispute resolution platform or a consumer mediator.</p>
+{% endblock %}

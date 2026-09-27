@@ -12,9 +12,12 @@ class Booking(models.Model):
         (STATUS_CANCELLED, 'Cancelled'),
     ]
 
+    # Kept (unlinked) when the account is deleted: bookings are accounting
+    # records.
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE,
+        null=True, blank=True,
+        on_delete=models.SET_NULL,
         related_name='bookings',
     )
     reference = models.CharField(max_length=50, unique=True)
@@ -30,6 +33,9 @@ class Booking(models.Model):
     total_price = models.FloatField(default=0.0)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default=STATUS_PENDING)
     notes = models.TextField(blank=True)
+    confirmed_at = models.DateTimeField(null=True, blank=True)
+    cancelled_at = models.DateTimeField(null=True, blank=True)
+    reminder_sent_at = models.DateTimeField(null=True, blank=True)
 
     class Meta:
         ordering = ['-booking_date']

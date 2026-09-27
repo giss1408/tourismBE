@@ -1,9 +1,24 @@
-Django==4.2.13
-graphene-django==3.2.2
-django-cors-headers==4.3.1
-djangorestframework-simplejwt==5.3.1
-djangorestframework==3.15.1
-PyJWT==2.8.0
-psycopg2-binary==2.9.9
+# Web framework and API
+Django==5.2.17
+graphene-django==3.2.3
+django-cors-headers==4.9.0
+djangorestframework==3.18.1
+djangorestframework-simplejwt==5.5.1
+PyJWT==2.15.0
+
+# Configuration and database
 python-decouple==3.8
-Pillow==10.3.0
+dj-database-url==3.1.2
+psycopg[binary]==3.3.6
+redis==8.1.0
+
+# Production server
+gunicorn==26.2.0
+whitenoise==6.12.0
+
+# Integrations
+google-auth==2.58.1
+requests==2.34.2
+stripe==15.6.1
+sentry-sdk==2.70.0
+Pillow==12.3.0

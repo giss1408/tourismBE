@@ -1,7 +1,20 @@
+import json
+
 import graphene
-from django.utils.dateparse import parse_datetime
 from django.utils import timezone
+from django.utils.dateparse import parse_datetime
+
+from apps.accounts.security import ANALYTICS_PER_IP, client_ip
+
 from .models import AnalyticsEvent, UserProperties
+
+MAX_NAME_LENGTH = 100
+MAX_PROPERTIES_BYTES = 4096
+
+
+def _check_properties(properties):
+    if len(json.dumps(properties or {})) > MAX_PROPERTIES_BYTES:
+        raise Exception('Analytics properties are too large.')
 
 
 class AnalyticsEventInputType(graphene.InputObjectType):
@@ -17,6 +30,10 @@ class TrackAnalyticsEvent(graphene.Mutation):
     ok = graphene.Boolean()
 
     def mutate(self, info, input):
+        ANALYTICS_PER_IP.consume(client_ip(info.context))
+        if not input.name or len(input.name) > MAX_NAME_LENGTH:
+            raise Exception('Invalid analytics event name.')
+        _check_properties(input.properties)
         user = info.context.user if info.context.user.is_authenticated else None
         ts = parse_datetime(input.timestamp) if input.timestamp else timezone.now()
 
@@ -44,8 +61,10 @@ class SetAnalyticsUserProperties(graphene.Mutation):
         if not user or not user.is_authenticated:
             raise Exception('UNAUTHENTICATED')
 
+        _check_properties(properties)
         obj, _ = UserProperties.objects.get_or_create(user=user)
         obj.properties.update(properties or {})
+        _check_properties(obj.properties)
         obj.save()
         return SetAnalyticsUserProperties(ok=True)
 

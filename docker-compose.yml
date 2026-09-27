@@ -1,14 +1,24 @@
+# Local development with PostgreSQL, like production. `make run` (SQLite)
+# still works for quick iterations.
 services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: tourism
+      POSTGRES_USER: tourism
+      POSTGRES_PASSWORD: tourism
+    ports: ["5432:5432"]
+    volumes: [pgdata:/var/lib/postgresql/data]
+
   web:
     build: .
-    command: >
-      sh -c "python manage.py migrate &&
-             python manage.py runserver 0.0.0.0:8000"
-    volumes:
-      - .:/app
-    ports:
-      - "8000:8000"
-    env_file:
-      - .env
+    command: sh -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
+    volumes: [".:/app"]
+    ports: ["8000:8000"]
+    env_file: [.env]
     environment:
-      - DJANGO_SETTINGS_MODULE=config.settings
+      DATABASE_URL: postgres://tourism:tourism@db:5432/tourism
+    depends_on: [db]
+
+volumes:
+  pgdata:

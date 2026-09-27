@@ -1,0 +1,28 @@
+{% extends "legal/base.html" %}
+{% block title %}Conditions générales de vente{% endblock %}
+{% block content %}
+<h1>Conditions générales de vente</h1>
+<p class="meta">{{ company }} · Contact : {{ support_email }}</p>
+<p class="draft">Projet : à faire relire par un juriste avant publication (règles sur les voyages à forfait, immatriculation de l’opérateur et garanties d’assurance à compléter).</p>
+
+<h2>1. Objet</h2>
+<p>Les présentes conditions régissent les réservations de séjours, circuits et activités guidées en Côte d’Ivoire effectuées via l’application {{ company }}.</p>
+
+<h2>2. Réservation</h2>
+<p>Une demande de réservation est enregistrée <em>en attente</em>. Elle devient <em>confirmée</em> après vérification des disponibilités et, le cas échéant, réception du paiement. Vous recevez un e-mail à chaque étape.</p>
+
+<h2>3. Prix et paiement</h2>
+<p>Les prix sont affichés en euros TTC, avec un montant indicatif en francs CFA (XOF, parité fixe 1 € = 655,957 FCFA). Des frais de service de {{ service_fee }} € s’appliquent à chaque réservation. Le paiement s’effectue en ligne via Stripe (carte, PayPal, Apple Pay, Google Pay).</p>
+
+<h2>4. Annulation par le voyageur</h2>
+<p>L’annulation est gratuite jusqu’à {{ free_cancellation_days }} jours avant le début du séjour : le montant est intégralement remboursé. Au-delà, la réservation peut être annulée mais n’est pas remboursée, sauf disposition légale contraire. Les remboursements apparaissent sous 5 à 10 jours ouvrés.</p>
+
+<h2>5. Annulation ou modification de notre fait</h2>
+<p>Si nous devons annuler ou modifier de façon importante une réservation confirmée, nous vous proposons une alternative ou un remboursement intégral.</p>
+
+<h2>6. Formalités</h2>
+<p>Passeport, visa et vaccination obligatoire contre la fièvre jaune sont sous votre responsabilité. Les informations de l’application sont indicatives ; consultez les conseils aux voyageurs de votre gouvernement avant le départ.</p>
+
+<h2>7. Réclamations et litiges</h2>
+<p>Écrivez à {{ support_email }}. À défaut de solution, vous pouvez recourir à la plateforme européenne de règlement en ligne des litiges ou à un médiateur de la consommation.</p>
+{% endblock %}

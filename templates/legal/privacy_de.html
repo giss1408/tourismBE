@@ -1,0 +1,32 @@
+{% extends "legal/base.html" %}
+{% block title %}Datenschutzerklärung{% endblock %}
+{% block content %}
+<h1>Datenschutzerklärung</h1>
+<p class="meta">{{ company }} · Kontakt: {{ support_email }}</p>
+<p class="draft">Entwurf: vor der Veröffentlichung juristisch prüfen und um die Angaben des Betreibers (Impressum) ergänzen.</p>
+
+<h2>1. Verantwortlicher</h2>
+<p>{{ company }} ist Verantwortlicher für die über die App und diese Website verarbeiteten personenbezogenen Daten. Fragen zu Ihren Daten: {{ support_email }}.</p>
+
+<h2>2. Welche Daten wir verarbeiten und warum</h2>
+<ul>
+  <li><strong>Konto</strong>: E-Mail-Adresse, Name, Profilbild (Social Login) – zur Bereitstellung Ihres Kontos (Vertrag).</li>
+  <li><strong>Buchungen</strong>: Reiseziel, Daten, Anzahl der Reisenden, Anmerkungen, Beträge – zur Durchführung Ihrer Reise (Vertrag) und für die Buchhaltung (gesetzliche Pflicht).</li>
+  <li><strong>Zahlungen</strong>: werden von Stripe abgewickelt. Wir sehen und speichern Ihre Kartennummer nicht; wir speichern Status und Betrag der Zahlung.</li>
+  <li><strong>Benachrichtigungen</strong>: eine Gerätekennung, um Sie über Ihre Reise zu informieren (Einwilligung, in den Telefoneinstellungen abschaltbar).</li>
+  <li><strong>Nutzungsstatistiken</strong>: aufgerufene Bildschirme und Aktionen in der App, nur wenn Sie zustimmen (Einwilligung, in der App widerrufbar).</li>
+  <li><strong>Bewertungen</strong>: Ihre Bewertung und Ihr Kommentar, veröffentlicht mit Ihrem Vornamen.</li>
+</ul>
+
+<h2>3. Empfänger</h2>
+<p>Unser Hosting-Anbieter, Stripe (Zahlungen), Google Firebase (Anmeldung und Benachrichtigungen), unser E-Mail-Dienstleister und, für Ihre Reise, die beteiligten lokalen Guides und Partner. Einige verarbeiten Daten ggf. außerhalb der EU auf Grundlage der Standardvertragsklauseln der EU-Kommission.</p>
+
+<h2>4. Speicherdauer</h2>
+<p>Kontodaten: bis zur Löschung des Kontos. Buchungs- und Zahlungsdaten: 10 Jahre (Aufbewahrungspflichten), ohne Verknüpfung mit dem gelöschten Konto. Nutzungsstatistiken: höchstens 13 Monate.</p>
+
+<h2>5. Ihre Rechte</h2>
+<p>Nach der DSGVO haben Sie das Recht auf Auskunft, Berichtigung, Löschung, Datenübertragbarkeit und Widerspruch sowie auf jederzeitigen Widerruf Ihrer Einwilligung. Sie können Ihr Konto direkt in der App löschen (Profil › Konto löschen) oder an {{ support_email }} schreiben. Sie können sich außerdem bei einer Datenschutz-Aufsichtsbehörde beschweren.</p>
+
+<h2>6. Sicherheit</h2>
+<p>Daten werden per HTTPS übertragen, Passwörter nur als Hash gespeichert, und der Zugriff auf unsere Systeme ist beschränkt.</p>
+{% endblock %}

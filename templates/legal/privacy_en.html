@@ -1,0 +1,32 @@
+{% extends "legal/base.html" %}
+{% block title %}Privacy policy{% endblock %}
+{% block content %}
+<h1>Privacy policy</h1>
+<p class="meta">{{ company }} · Contact: {{ support_email }}</p>
+<p class="draft">Draft: to be reviewed by a lawyer and completed with the operator's legal details before publication.</p>
+
+<h2>1. Who is responsible</h2>
+<p>{{ company }} is the controller of the personal data processed through the app and this website. Contact us at {{ support_email }} for any question about your data.</p>
+
+<h2>2. What we collect and why</h2>
+<ul>
+  <li><strong>Account</strong>: email address, name, profile photo (social sign-in) – to provide your account (contract).</li>
+  <li><strong>Bookings</strong>: destination, dates, number of guests, notes, amounts – to handle your trip (contract) and keep accounting records (legal obligation).</li>
+  <li><strong>Payments</strong>: processed by Stripe. We never see or store your card number; we keep the payment status and amount.</li>
+  <li><strong>Notifications</strong>: a device token, to send trip updates you asked for (consent, can be switched off in your phone settings).</li>
+  <li><strong>Usage statistics</strong>: pages viewed and actions in the app, only if you accept them (consent, can be withdrawn in the app).</li>
+  <li><strong>Reviews</strong>: your rating and comment, published with your first name.</li>
+</ul>
+
+<h2>3. Who receives your data</h2>
+<p>Our hosting provider, Stripe (payments), Google Firebase (sign-in and notifications), our email provider and, for your trip, the local guides and partners involved in your booking. Some of them may process data outside the EU under the European Commission's standard contractual clauses.</p>
+
+<h2>4. How long we keep it</h2>
+<p>Account data: until you delete your account. Booking and payment records: 10 years (accounting obligations), without link to your deleted account. Usage statistics: 13 months at most.</p>
+
+<h2>5. Your rights</h2>
+<p>Under the GDPR you can access, correct, delete or export your data, object to its processing and withdraw your consent at any time. You can delete your account directly in the app (Profile › Delete account) or write to {{ support_email }}. You may also lodge a complaint with your data protection authority.</p>
+
+<h2>6. Security</h2>
+<p>Data is transmitted over HTTPS, passwords are stored hashed, and access to our systems is restricted.</p>
+{% endblock %}
